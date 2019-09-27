@@ -19,6 +19,7 @@ Let's get all the setup out of the way to begin testing our utility functions. I
 - In the `src` folder create a folder titled `__tests__` and then in that folder create a file called `utilFunctions.test.js`.
   - Jest will automatically detect this folder and run all files inside of it when you run `npm run test`
 - In the `package.json` add this code snippet.
+  - This snippet will allow us to place js files in the `__data__` folder that will be ignored by the test runner
 
 ```json
 "jest": {
@@ -40,13 +41,13 @@ export const users = [
   {
     id: 1,
     first: 'Test',
-    last: 'User'
+    last: 'User',
   },
   {
     id: 2,
     first: 'Hello',
-    last: 'World'
-  }
+    last: 'World',
+  },
 ];
 
 export const posts = [
@@ -55,35 +56,35 @@ export const posts = [
     userId: 2,
     title: 'This is a long post',
     text:
-      'This is a longer string that will be used to test whether or not the shortenText function correctly shortens the text correctly or not.'
+      'This is a longer string that will be used to test whether or not the shortenText function correctly shortens the text correctly or not.',
   },
   {
     id: 2,
     userId: 2,
     title: 'This is a short post',
-    text: 'hello world'
+    text: 'hello world',
   },
   {
     id: 3,
     userId: 1,
     title: 'This is a long post',
     text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
   },
   {
     id: 4,
     userId: 1,
     title: 'This is a long post',
     text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
   },
   {
     id: 5,
     userId: 3,
     title: 'This is a long post',
     text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-  }
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+  },
 ];
 export const shortText = 'This is a very short sentence';
 
@@ -115,11 +116,180 @@ In this step, we will write unit tests for our three pure functions in this appl
 - After refactoring, run the test suite again till it passes
 - Write a test for `wordCount` that will check the `posts` array and return a total word count
   - The number of words in the posts array should equal 233
-- Write a test for `attachUserName` that will check to see if the first post returned from running this function has a property `displayName`
-- Lasty, write a test for `attachUserName` to check if it removes any post with no matching user. This test also has a logic hole and will cause the test to fail. You will need to refactor it.
+- Write a test for `attachUserName` that will check to see if the first post returned from running this function has a property `displayName`. Running this test will cause a failure since this function does not currently account for any posts that don't have a matching user.
+  - refactor this function to filter out all the posts with no users.
+- After refactoring, run `npm run test` again until it passes
+- Lasty, write a test for `attachUserName` to check if it removes any post with no matching user.
   - The returned array should only contain posts that had a matching user
   - You should not alter the original array passed in
-- After refactoring, run `npm run test` again until it passes
+
+<details>
+
+<summary>Detailed Instructions</summary>
+
+<br />
+
+Let's begin by opening the `utilFunctions.test.js` located in `src/__tests__`. We have several functions in our application that are each handling different pieces of logic. These are perfect for testing since they are pure functions (pure functions are functions that given the same inputs will always return the same output). Let's import these functions so we can invoke them for our tests. The nice thing about our test runner is that it has access to all files in our project directory so we can just as easily test a backend function as we can a frontend one.
+
+```js
+import { shortenText } from '../utils/functions';
+import { wordCount, attachUserName } from '../../server/utils';
+```
+
+We will need some test data to pass our functions. We could write them in the file itself but why not bring in data from our data file that can be used in multiple places? Let's import the following pieces of data.
+
+```js
+import { shortText, longText, posts, users } from './__data__/testData';
+```
+
+Now that we have the necessary imports, let's create the first unit test starting with `shortenText`. This function will take in a string and if the string's length is greater than 100 it will shorten it to 100 and concatenate 3 periods on the end. This is useful in our application when we want to show the non-expanded version of a post.
+
+We will use the `it` method to pass a description of the test and a callback function that Jest will execute to carry out our assertions. Let's then invoke `expect` and pass in `shortenText(shortText)` to get the shortened version of the passed in text string. Since this string has less than 100 characters to begin with, we should expect that the length of the returned string is equal to the initial length of the string (29).
+
+```js
+it('shortenText should not alter a string with less than 100 characters', () => {
+  expect(shortenText(shortText)).toHaveLength(29);
+});
+```
+
+Running this test will pass just like we expect it to. Let's write another test for `shortenText` but this time check if it correctly shortens text that is over 100 characters and adds 3 periods at the end. Since we are going to be testing two things here, lets create a variable called `shortened` that we can save the result of invoking `shortenText(longText)` to. Next, let's create our first assertion and say that we expect the length of `shortened` to not be equal to the length of `longText`. Then, let's write our second assertion as say that we expect `shortened`'s last 3 characters to be equal to `...`.
+
+```js
+it('shortenText should cut off extra characters after 100 and add three periods', () => {
+  const shortened = shortenText(longText);
+  expect(shortened).not.toHaveLength(longText.length);
+  expect(shortened.slice(-3)).toBe('...');
+});
+```
+
+Run `npm run test` again. It breaks! You should get an error that the last 3 characters of the `shortened` string are not `...`. This is because it just so happens calling `.trim()` on this string after shortening it to 100 characters removed the empty space at the end making it 99 characters. The logic of our function then checks if the length of the string is 100 and if so it will all 3 periods. This is fault in our logic and we caught it using a unit test. Let's refactor the function so that it correctly accounts for this case.
+
+```js
+export const shortenText = text => {
+  if (text.trim().length >= 100 && text.length !== 100) {
+    return `${text.substr(0, 100).trim()}...`;
+  }
+  return text;
+};
+```
+
+After we make the changes and run `npm run test` again, our test will pass. That is enough testing on that function. Next let's write a few tests to test if the `wordCount` function will correctly sum up the number of words in an array full of posts. Write a test for `wordCount` that will check if the value of invoking it and passing in our test posts array is equal to 233 words.
+
+```js
+it('wordCount should correctly count the number of words in a sentence', () => {
+  expect(wordCount(posts)).toBe(233);
+});
+```
+
+Let's lastly write a few tests for `attachUserName`. The first should check to make sure that passing in users and posts will attach a `displayName` property to every post. Let's save the result of invoking `attachUserName` to a variable called `newPosts`. Then we can assert that the first item in the new array has a property called `displayName`.
+
+```js
+it('attachUserName should correctly attach a users full name to a post', () => {
+  const newPosts = attachUserName(users, posts);
+  expect(newPosts[0]).toHaveProperty('displayName');
+});
+```
+
+Run `npm run test`. You should see a failing test here. This is because one of our posts does not have a matching user. we will need to refactor this function to filter out posts that do have a matching user.
+
+```js
+attachUserName(users, posts) {
+    let userDict = users.reduce((a, v) => {
+      a[v.id] = v;
+      return a;
+    }, {});
+    return posts
+      .filter(p => userDict[p.userId])
+      .map(p => {
+        p.displayName = `${userDict[p.userId].first} ${userDict[p.userId].last}`;
+        return p;
+      });
+  }
+```
+
+Lastly, create a test that checks to make sure that the test removes any posts with no matching user. You will want to save `attachUserName(users, posts)` to a new variable `newPosts`. Then you can assert that `newPosts` does not contain the deleted post. There is a helpful matcher that Jest gives us called `.toContainEqual` for this very purpose. It will check an array of objects and see if it can find a matching one.
+
+```js
+it('attachUserName should remove any post with no matching user', () => {
+  const newPosts = attachUserName(users, posts);
+  const deletedPost = posts[5];
+  expect(newPosts).not.toContainEqual(deletedPost);
+});
+```
+
+</details>
+
+### Solution
+
+<details>
+
+<summary> <code> utilFunctions.test.js </code> </summary>
+
+```js
+import { shortenText } from '../utils/functions';
+import { wordCount, attachUserName } from '../../server/utils';
+import { shortText, longText, posts, users } from './__data__/testData';
+
+it('shortenText should not alter a string with less than 100 characters', () => {
+  expect(shortenText(shortText)).toHaveLength(29);
+});
+
+it('shortenText should cut off extra characters after 100 and add three periods', () => {
+  const shortened = shortenText(longText);
+  expect(shortened).not.toHaveLength(longText.length);
+  expect(shortened.slice(-3)).toBe('...');
+});
+
+it('wordCount should correctly count the number of words in a sentence', () => {
+  expect(wordCount(posts)).toBe(233);
+});
+
+it('attachUserName should correctly attach a users full name to a post', () => {
+  const newPosts = attachUserName(users, posts);
+  expect(newPosts[0]).toHaveProperty('displayName');
+});
+
+it('attachUserName should remove any post with no matching user', () => {
+  const newPosts = attachUserName(users, posts);
+  const deletedPost = posts[5];
+  expect(newPosts).not.toContainEqual(deletedPost);
+});
+```
+
+<summary> <code> src/utils/functions.js </code> </summary>
+
+```js
+export const shortenText = text => {
+  if (text.trim().length >= 100 && text.length !== 100) {
+    return `${text.substr(0, 100).trim()}...`;
+  }
+  return text;
+};
+```
+
+<summary> <code> src/utils/functions.js </code> </summary>
+
+```js
+module.exports = {
+  wordCount(posts) {
+    return posts.reduce((a, v) => (a += v.text.split(' ').length), 0);
+  },
+  attachUserName(users, posts) {
+    let userDict = users.reduce((a, v) => {
+      a[v.id] = v;
+      return a;
+    }, {});
+    return posts
+      .filter(p => userDict[p.userId])
+      .map(p => {
+        p.displayName = `${userDict[p.userId].first} ${userDict[p.userId].last}`;
+        return p;
+      });
+  },
+};
+```
+
+</details>
 
 ## Step 3
 
@@ -143,6 +313,41 @@ Now we will move on to testing individual React Components. Let's start with `Po
   - You will need to use jest's `spyOn` method to watch for axios get requests and send back an individual post
   - use the async version of act to await the axios request/response cycle
   - use the `.toContain` method to check if the inner textContent of our rendered `Post` matches the posts text that returned as data to the component
+
+## Solution
+
+<details>
+
+<summary> <code> src/__tests__/Post.test.js </code> </summary>
+
+```js
+import React from 'react';
+import { render, act } from '@testing-library/react';
+import Post from '../views/Post';
+import axios from 'axios';
+import { MemoryRouter } from 'react-router-dom';
+import { posts } from './__data__/testData';
+
+it('Renders out a post widget', async () => {
+  const post = posts[0];
+  let container;
+  jest
+    .spyOn(axios, 'get')
+    .mockImplementation(() => Promise.resolve({ data: post }));
+  await act(async () => {
+    let renderObj = render(
+      <MemoryRouter>
+        <Post match={{ params: { postId: 1 } }} />
+      </MemoryRouter>,
+    );
+    container = renderObj.container;
+  });
+
+  expect(container.textContent).toContain(post.text);
+});
+```
+
+</details>
 
 ## Step 4
 
@@ -174,6 +379,56 @@ The next component we will test is `PostWidget` in the `src/components` folder. 
 - Create a test that will check if `PostWidget` displays all text when passed an expanded prop
   - pass `longPost` through
   - expanded must be set to true
+
+## Solution
+
+<details>
+
+<summary> <code> src/__tests__/PostWidget.test.js </code> </summary>
+
+```js
+import React from 'react';
+import { cleanup, render } from '@testing-library/react';
+import PostWidget from '../components/PostWidget';
+import { MemoryRouter } from 'react-router-dom';
+import { shortenText } from '../utils/functions';
+import { posts } from './__data__/testData';
+
+const longPost = posts[0];
+const post = posts[1];
+
+afterEach(cleanup);
+
+it('Renders out a Post', () => {
+  const { container } = render(
+    <MemoryRouter>
+      <PostWidget {...post} />
+    </MemoryRouter>,
+  );
+  expect(container.textContent).toContain(post.text);
+});
+
+it('Shortens display text when expanded is false', () => {
+  const { container } = render(
+    <MemoryRouter>
+      <PostWidget {...longPost} />
+    </MemoryRouter>,
+  );
+  expect(container.textContent).toContain(shortenText(longPost.text));
+});
+
+it('Displays all text when expanded is true', () => {
+  const { container } = render(
+    <MemoryRouter>
+      <PostWidget expanded={true} {...longPost} />
+    </MemoryRouter>,
+  );
+
+  expect(container.textContent).toContain(longPost.text);
+});
+```
+
+</details>
 
 ## Step 5
 
