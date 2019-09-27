@@ -4,7 +4,7 @@
 
 We will be using a completed full stack project to test both pure functions server/client side and React components. This project will use Jest and react-test-library. You will focus on writing tests for functions/Components that already exist with some slight refactoring on the existing codebase. Run the command `npm run dev` to spin up the express server and React project and then familiarize yourself with the functionality.
 
-To keep the number of libraries you need to learn to a minimum, only Jest and react testing library are included in this project. For shallow testing of components, it is highly recommended you research enzyme. It provided a lot of functionality for easily testing React components. This project is intended to be a starting point for your testing knowledge and not an all inclusive resource.
+To keep the number of libraries you need to learn to a minimum, only Jest and react testing library are included in this project. For shallow testing of components, it is highly recommended you research enzyme. It provides a lot of functionality for easily testing React components. This project is intended to be a starting point for your testing knowledge and not an all inclusive resource.
 
 ## Step 1
 
@@ -109,7 +109,7 @@ In this step, we will write unit tests for our three pure functions in this appl
 - Create a test for `shortenText` to make sure it will not alter a string under 100 characters
   - use the `.toHaveLength` matcher and the `shortText` variable
 - Create a test for `shortenText` to make sure it shortens text over 100 characters and adds 3 periods at the end
-  - you will need two assertions in this test; one to check length and the second to see if the last 3 characters are ...
+  - you will need two assertions in this test; one to check length and the second to see if the last 3 characters are `...`
   - use the `.not` matcher on this to compare original `longText` length vs the new length
 - Run `npm run test`. The second assertion should fail. You will need to refactor this test to get it to pass.
   - Hint: Check the function logic. Since the string ends with a blank space, the function will incorrectly read it's length as 99
@@ -162,7 +162,7 @@ it('shortenText should cut off extra characters after 100 and add three periods'
 });
 ```
 
-Run `npm run test` again. It breaks! You should get an error that the last 3 characters of the `shortened` string are not `...`. This is because it just so happens calling `.trim()` on this string after shortening it to 100 characters removed the empty space at the end making it 99 characters. The logic of our function then checks if the length of the string is 100 and if so it will all 3 periods. This is fault in our logic and we caught it using a unit test. Let's refactor the function so that it correctly accounts for this case.
+Run `npm run test` again. It breaks! You should get an error that the last 3 characters of the `shortened` string are not `...`. This is because it just so happens calling `.trim()` on this string after shortening it to 100 characters removed the empty space at the end making it 99 characters. The logic of our function then checks if the length of the string is 100 and if so it will add 3 periods. This is a fault in our logic and we caught it using a unit test. Let's refactor the function so that it correctly accounts for this case.
 
 ```js
 export const shortenText = text => {
@@ -256,6 +256,10 @@ it('attachUserName should remove any post with no matching user', () => {
 });
 ```
 
+</details>
+
+<details>
+
 <summary> <code> src/utils/functions.js </code> </summary>
 
 ```js
@@ -266,6 +270,10 @@ export const shortenText = text => {
   return text;
 };
 ```
+
+</details>
+
+<details>
 
 <summary> <code> src/utils/functions.js </code> </summary>
 
@@ -313,6 +321,76 @@ Now we will move on to testing individual React Components. Let's start with `Po
   - You will need to use jest's `spyOn` method to watch for axios get requests and send back an individual post
   - use the async version of act to await the axios request/response cycle
   - use the `.toContain` method to check if the inner textContent of our rendered `Post` matches the posts text that returned as data to the component
+
+<details>
+
+<summary>Detailed Instructions</summary>
+
+<br />
+
+Let's move on to writing our first unit tests for a React component. The component that we will test is `Post`. It is a component that takes in a post object and then displays the title, text content and a link to the user's page that wrote it. Create a file called `Post.test.js` in the `src/__tests__` folder.
+
+Now, open the file and let's import the necessary packages. When testing React components much as writing them, React has to be in scope. Bring that in right at the top. Next thing to bring in is `render` and `act` from the library that we installed at the beginning of the project `@testing-library/react`. `render` will handle all of the behind the scenes rendering of components for us and act will allow us more granular control of deciding when to render it out. Next bring in `Post` from `src/views` since we'll need to render this out to test it. Bring in `axios` since the `Post` component makes an axios call. We will need to intercept that call and pass back some test data. import `MemoryRouter` from `react-router-dom` which is a lightweight provider given to us that gives us access to `withRouter`. Lastly, import `posts` from our test data.
+
+```js
+import React from 'react';
+import { render, act } from '@testing-library/react';
+import Post from '../views/Post';
+import axios from 'axios';
+import { MemoryRouter } from 'react-router-dom';
+import { posts } from './__data__/testData';
+```
+
+Now we can write our test. Since we are just using Jest, we will still use the `it` method. Pass a string along the lines of 'renders out a post widget'. Make the callback function async so we can use await in the body of the function to wait for all axios calls to complete before running our assertions. Create a variable called `post` that is the first object in the `posts` array. Then create an uninitialized variable called `container`. We will save our container object to it once we finish rendering it out using `act` and `render`.
+
+Lastly, we will want to call the method `spyOn` on the jest object. This is a method that lets us listen for certain method calls on objects and send back a custom response. In this case lets invoke `spyOn` passing through axios, and 'get' to have it listen for all 'get' requests. We will then chain onto the `spyOn` method the `.mockImplementation` method. this takes in a callback function that we can return a resolved promise from to resolve the axios request with our own object.
+
+```js
+it('Renders out a post widget', async () => {
+  const post = posts[0];
+  let container;
+  jest
+    .spyOn(axios, 'get')
+    .mockImplementation(() => Promise.resolve({ data: post }));
+});
+```
+
+Now we'll use the async version of the `act` method to render out our `Post` component and wait for the axios request to resolve from our `spyOn` method. Since the `Post` component is wrapped in the HOC `withRouter` we need to wrap our rendered out `Post` component with the `MemoryRouter` component. This will spoof what `HashRouter`/`BrowserRouter` does for us in the actual DOM. Pass a match param to the `Post` component whose value is an object with a params property whose value is also an object that has one property; postId: 1. This is spoofing the match object that gets passed through to `Post`.
+
+```js
+await act(async () => {
+  let renderObj = render(
+    <MemoryRouter>
+      <Post match={{ params: { postId: 1 } }} />
+    </MemoryRouter>,
+  );
+  container = renderObj.container;
+});
+```
+
+Lastly, let's make an assertion about our container object. Since we passed in the first post, we should expect that our `Post` component will have inner text equal to the text of the first post object. We can assert about that using the matcher `.toContain`.
+
+```js
+it('Renders out a post widget', async () => {
+  const post = posts[0];
+  let container;
+  jest
+    .spyOn(axios, 'get')
+    .mockImplementation(() => Promise.resolve({ data: post }));
+  await act(async () => {
+    let renderObj = render(
+      <MemoryRouter>
+        <Post match={{ params: { postId: 1 } }} />
+      </MemoryRouter>,
+    );
+    container = renderObj.container;
+  });
+
+  expect(container.textContent).toContain(post.text);
+});
+```
+
+</details>
 
 ## Solution
 
@@ -379,6 +457,76 @@ The next component we will test is `PostWidget` in the `src/components` folder. 
 - Create a test that will check if `PostWidget` displays all text when passed an expanded prop
   - pass `longPost` through
   - expanded must be set to true
+
+<details>
+
+<summary>Detailed instructions</summary>
+
+<br />
+
+The next component that we will be testing is the `PostWidget` component. While `Post` made the axios call to retrieve a post and then rendered out `PostWidget`, the `PostWidget` component is more complicated and determines whether it needs to display the full text length or not based on the passed in props. Let's write some tests for it.
+
+The first thing we need to do is import the necessary packages / functions. I'll save you the detailed walkthrough of all of them since we covered that in the preceding step. The only new thing that has not been covered is the `cleanup` method from the `@testing-library/react` package. Similar to when we're running unit tests on the same object, we need to ensure a unified starting spot from where to run our test logic. `cleanup` will clean the test 'dom' for us and ensure a clean starting point.
+
+```js
+import React from 'react';
+import { cleanup, render } from '@testing-library/react';
+import PostWidget from '../components/PostWidget';
+import { MemoryRouter } from 'react-router-dom';
+import { shortenText } from '../utils/functions';
+import { posts } from './__data__/testData';
+```
+
+Now let's create a few variables for easy reference later. We need to test this component passing in a long post and short post so create two variables `longPost` and `post`. `longPost` will be the first value in the `posts` array and `post` will be the second. Next, invoke `afterEach` passing in cleanup. We don't need to worry about cleanup after doing so.
+
+```js
+const longPost = posts[0];
+const post = posts[1];
+
+afterEach(cleanup);
+```
+
+Since all the setup is done, let's write the first test. The first text can be very basic and should just check that `PostWidget` actually renders out the post that is passed to it. Create an `it` block and then render out `PostWidget` passing through the destructured `post` object. Destructure `container` from the returned result of invoking `render`. Then assert about the container's inner text content that it should contain `post`'s `text` value.
+
+```js
+it('Renders out a Post', () => {
+  const { container } = render(
+    <MemoryRouter>
+      <PostWidget {...post} />
+    </MemoryRouter>,
+  );
+  expect(container.textContent).toContain(post.text);
+});
+```
+
+Repeat this process for the next test. This next test should check if passing through `longPost` will shorten the displayed text by default. Render out `PostWidget` passing through `longPost` and destructure `container` from the result of invoking `render`. The assertion for this test should check if the text content of container matches the result of running `shortenText` on `longPost.text`.
+
+```js
+it('Shortens display text when expanded is false', () => {
+  const { container } = render(
+    <MemoryRouter>
+      <PostWidget {...longPost} />
+    </MemoryRouter>,
+  );
+  expect(container.textContent).toContain(shortenText(longPost.text));
+});
+```
+
+There is one more test to write that will be pretty similar to the last two. Let's write a test that checks if passing through the `longPost` to `PostWidget` but passing an extended prop will display all the text of the post. Follow the steps for the first two tests except on this one the assertion should pass through `expanded={true}` to the `PostWidget`. Then the assertion should check if the inner text content matches the text of the `longPost`.
+
+```js
+it('Displays all text when expanded is true', () => {
+  const { container } = render(
+    <MemoryRouter>
+      <PostWidget expanded={true} {...longPost} />
+    </MemoryRouter>,
+  );
+
+  expect(container.textContent).toContain(longPost.text);
+});
+```
+
+</details>
 
 ## Solution
 
