@@ -20,3 +20,9 @@ it('attachUserName should correctly attach a users full name to a post', () => {
   const newPosts = attachUserName(users, posts);
   expect(newPosts[0]).toHaveProperty('displayName');
 });
+
+it('attachUserName should remove any post with no matching user', () => {
+  const newPosts = attachUserName(users, posts);
+  const deletedPost = posts[5];
+  expect(newPosts).not.toContainEqual(deletedPost);
+});

@@ -40,13 +40,13 @@ export const users = [
   {
     id: 1,
     first: 'Test',
-    last: 'User'
+    last: 'User',
   },
   {
     id: 2,
     first: 'Hello',
-    last: 'World'
-  }
+    last: 'World',
+  },
 ];
 
 export const posts = [
@@ -55,35 +55,35 @@ export const posts = [
     userId: 2,
     title: 'This is a long post',
     text:
-      'This is a longer string that will be used to test whether or not the shortenText function correctly shortens the text correctly or not.'
+      'This is a longer string that will be used to test whether or not the shortenText function correctly shortens the text correctly or not.',
   },
   {
     id: 2,
     userId: 2,
     title: 'This is a short post',
-    text: 'hello world'
+    text: 'hello world',
   },
   {
     id: 3,
     userId: 1,
     title: 'This is a long post',
     text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
   },
   {
     id: 4,
     userId: 1,
     title: 'This is a long post',
     text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
   },
   {
     id: 5,
     userId: 3,
     title: 'This is a long post',
     text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-  }
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+  },
 ];
 export const shortText = 'This is a very short sentence';
 
@@ -116,7 +116,8 @@ In this step, we will write unit tests for our three pure functions in this appl
 - Write a test for `wordCount` that will check the `posts` array and return a total word count
   - The number of words in the posts array should equal 233
 - Write a test for `attachUserName` that will check to see if the first post returned from running this function has a property `displayName`
-- Lasty, write a test for `attachUserName` to check if it removes any post with no matching user. This test also has a logic hole and will cause the test to fail. You will need to refactor it.
+  - running the test suite now will cause this to fail. You will need to refactor this function to filter out any posts with no matching user
+- Lasty, write a test for `attachUserName` to check if it removes any post with no matching user.
   - The returned array should only contain posts that had a matching user
   - You should not alter the original array passed in
 - After refactoring, run `npm run test` again until it passes
