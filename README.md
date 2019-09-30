@@ -447,7 +447,7 @@ The next component we will test is `PostWidget` in the `src/components` folder. 
 - Create a file titled `PostWidget.test.js` in the `__tests__` folder.
 - Import all necessary packages/files (remember relative pathing)
   - `React`
-  - `render` and `cleanup` from `@testing-library/react`
+  - `render` from `@testing-library/react`
   - `PostWidget` from `src/components`
   - `MemoryRouter` from react router
   - `shortenText` from our utils
