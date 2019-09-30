@@ -8,6 +8,15 @@ To keep the number of libraries you need to learn to a minimum, only Jest and re
 
 ## Step 1
 
+Setup
+
+### Instructions
+
+- Fork and clone this repo
+- run `npm i`
+
+## Step 2
+
 ### Summary
 
 Let's get all the setup out of the way to begin testing our utility functions. In this step, we will install the required dependency for React testing, create our first test file and tell Jest to ignore our test data file(s).
@@ -94,7 +103,7 @@ export const longText =
 
 </details>
 
-## Step 2
+## Step 3
 
 ### Summary
 
@@ -299,7 +308,7 @@ module.exports = {
 
 </details>
 
-## Step 3
+## Step 4
 
 ### Summary
 
@@ -330,7 +339,7 @@ Now we will move on to testing individual React Components. Let's start with `Po
 
 Let's move on to writing our first unit tests for a React component. The component that we will test is `Post`. It is a component that takes in a post object and then displays the title, text content and a link to the user's page that wrote it. Create a file called `Post.test.js` in the `src/__tests__` folder.
 
-Now, open the file and let's import the necessary packages. When testing React components much as writing them, React has to be in scope. Bring that in right at the top. Next thing to bring in is `render` and `act` from the library that we installed at the beginning of the project `@testing-library/react`. `render` will handle all of the behind the scenes rendering of components for us and act will allow us more granular control of deciding when to render it out. Next bring in `Post` from `src/views` since we'll need to render this out to test it. Bring in `axios` since the `Post` component makes an axios call. We will need to intercept that call and pass back some test data. import `MemoryRouter` from `react-router-dom` which is a lightweight provider given to us that gives us access to `withRouter`. Lastly, import `posts` from our test data.
+Now, open the file and let's import the necessary packages. When testing React components much as writing them, React has to be in scope. Bring that in right at the top. Next thing to bring in is `render` and `act` from the library that we installed at the beginning of the project `@testing-library/react`. `render` will handle all of the behind the scenes rendering of components for us and act will wait for all events such as rendering or data fetching to resolve before moving on to the assertions. Next bring in `Post` from `src/views` since we'll need to render this out to test it. Bring in `axios` since the `Post` component makes an axios call. We will need to intercept that call and pass back some test data. import `MemoryRouter` from `react-router-dom` which is a lightweight provider given to us that gives us access to `withRouter`. Lastly, import `posts` from our test data.
 
 ```js
 import React from 'react';
@@ -343,7 +352,7 @@ import { posts } from './__data__/testData';
 
 Now we can write our test. Since we are just using Jest, we will still use the `it` method. Pass a string along the lines of 'renders out a post widget'. Make the callback function async so we can use await in the body of the function to wait for all axios calls to complete before running our assertions. Create a variable called `post` that is the first object in the `posts` array. Then create an uninitialized variable called `container`. We will save our container object to it once we finish rendering it out using `act` and `render`.
 
-Lastly, we will want to call the method `spyOn` on the jest object. This is a method that lets us listen for certain method calls on objects and send back a custom response. In this case lets invoke `spyOn` passing through axios, and 'get' to have it listen for all 'get' requests. We will then chain onto the `spyOn` method the `.mockImplementation` method. this takes in a callback function that we can return a resolved promise from to resolve the axios request with our own object.
+Lastly, we will want to call the method `spyOn` on the jest object. This is a method that lets us listen for certain method calls on objects and send back a custom response. In this case let's invoke `spyOn` passing through axios, and 'get' to have it listen for all 'get' requests. We will then chain onto the `spyOn` method the `.mockImplementation` method. `.mockImplementation` lets us override the actual 'get' methods implementation and write our own implenentation logic. In this case, we can pass back a resolved promise with an object that has a data property. This will resolve the axios request and let us render out the post in the `Post` component.
 
 ```js
 it('Renders out a post widget', async () => {
@@ -427,7 +436,7 @@ it('Renders out a post widget', async () => {
 
 </details>
 
-## Step 4
+## Step 5
 
 ### Summary
 
@@ -446,8 +455,6 @@ The next component we will test is `PostWidget` in the `src/components` folder. 
 - Create two variables at the top; `longPost` and `post`. These will be used in various tests in the file
   - `longPost` will be the post at 0
   - `post` will be the post at 1
-- We will be running multiple tests in this file so it's a good idea to run `afterEach` (Jest) and pass in the `cleanup` method
-  - This will keep the test environment clean between each successive test
 - Create a test that will render the `PostWidget` and check if the inner text content contains the passed in posts text content
   - You will need to destructure and pass the post data through to `PostWidget`
   - You will need to wrap `PostWidget` in a `MemoryRouter` component
@@ -466,24 +473,22 @@ The next component we will test is `PostWidget` in the `src/components` folder. 
 
 The next component that we will be testing is the `PostWidget` component. While `Post` made the axios call to retrieve a post and then rendered out `PostWidget`, the `PostWidget` component is more complicated and determines whether it needs to display the full text length or not based on the passed in props. Let's write some tests for it.
 
-The first thing we need to do is import the necessary packages / functions. I'll save you the detailed walkthrough of all of them since we covered that in the preceding step. The only new thing that has not been covered is the `cleanup` method from the `@testing-library/react` package. Similar to when we're running unit tests on the same object, we need to ensure a unified starting spot from where to run our test logic. `cleanup` will clean the test 'dom' for us and ensure a clean starting point.
+The first thing we need to do is import the necessary packages / functions. I'll save you the detailed walkthrough of all of them since we covered that in the preceding step.
 
 ```js
 import React from 'react';
-import { cleanup, render } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import PostWidget from '../components/PostWidget';
 import { MemoryRouter } from 'react-router-dom';
 import { shortenText } from '../utils/functions';
 import { posts } from './__data__/testData';
 ```
 
-Now let's create a few variables for easy reference later. We need to test this component passing in a long post and short post so create two variables `longPost` and `post`. `longPost` will be the first value in the `posts` array and `post` will be the second. Next, invoke `afterEach` passing in cleanup. We don't need to worry about cleanup after doing so.
+Now let's create a few variables for easy reference later. We need to test this component passing in a long post and short post so create two variables `longPost` and `post`. `longPost` will be the first value in the `posts` array and `post` will be the second.
 
 ```js
 const longPost = posts[0];
 const post = posts[1];
-
-afterEach(cleanup);
 ```
 
 Since all the setup is done, let's write the first test. The first text can be very basic and should just check that `PostWidget` actually renders out the post that is passed to it. Create an `it` block and then render out `PostWidget` passing through the destructured `post` object. Destructure `container` from the returned result of invoking `render`. Then assert about the container's inner text content that it should contain `post`'s `text` value.
@@ -536,7 +541,7 @@ it('Displays all text when expanded is true', () => {
 
 ```js
 import React from 'react';
-import { cleanup, render } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import PostWidget from '../components/PostWidget';
 import { MemoryRouter } from 'react-router-dom';
 import { shortenText } from '../utils/functions';
@@ -544,8 +549,6 @@ import { posts } from './__data__/testData';
 
 const longPost = posts[0];
 const post = posts[1];
-
-afterEach(cleanup);
 
 it('Renders out a Post', () => {
   const { container } = render(
@@ -578,7 +581,7 @@ it('Displays all text when expanded is true', () => {
 
 </details>
 
-## Step 5
+## Step 6
 
 ### Summary
 
