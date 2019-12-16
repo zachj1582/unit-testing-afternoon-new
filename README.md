@@ -39,7 +39,7 @@ Let's get all the setup out of the way to begin testing our utility functions. I
 ```
 
 - Lastly, in the `__tests__` folder create a folder titled `__data__` and inside that folder create the file `testData.js`
-- In that new file past the following test data for use later
+- In that new file paste the following test data for use later
 
 <details>
 
