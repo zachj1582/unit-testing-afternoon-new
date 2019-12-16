@@ -128,7 +128,7 @@ In this step, we will write unit tests for our three pure functions in this appl
 - Write a test for `attachUserName` that will check to see if the first post returned from running this function has a property `displayName`. Running this test will cause a failure since this function does not currently account for any posts that don't have a matching user.
   - refactor this function to filter out all the posts with no users.
 - After refactoring, run `npm run test` again until it passes
-- Lasty, write a test for `attachUserName` to check that it removes any post with no matching user.
+- Lastly, write a test for `attachUserName` to check that it removes any post with no matching user.
   - The returned array should only contain posts that had a matching user
   - You should not alter the original array passed in
 
@@ -189,8 +189,7 @@ it('wordCount should correctly count the number of words in a sentence', () => {
   expect(wordCount(posts)).toBe(233);
 });
 ```
-
-Let's lastly write a few tests for `attachUserName`. The first should check to make sure that passing in users and posts will attach a `displayName` property to every post. Let's save the result of invoking `attachUserName` to a variable called `newPosts`. Then we can assert that the first item in the new array has a property called `displayName`.
+Next, let's write a few tests for `attachUserName`. The first should check to make sure that passing in users and posts will attach a `displayName` property to every post. Let's save the result of invoking `attachUserName` to a variable called `newPosts`. Then we can assert that the first item in the new array has a property called `displayName`.
 
 ```js
 it('attachUserName should correctly attach a users full name to a post', () => {
