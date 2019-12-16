@@ -128,7 +128,7 @@ In this step, we will write unit tests for our three pure functions in this appl
 - Write a test for `attachUserName` that will check to see if the first post returned from running this function has a property `displayName`. Running this test will cause a failure since this function does not currently account for any posts that don't have a matching user.
   - refactor this function to filter out all the posts with no users.
 - After refactoring, run `npm run test` again until it passes
-- Lasty, write a test for `attachUserName` to check if it removes any post with no matching user.
+- Lasty, write a test for `attachUserName` to check that it removes any post with no matching user.
   - The returned array should only contain posts that had a matching user
   - You should not alter the original array passed in
 
@@ -171,7 +171,7 @@ it('shortenText should cut off extra characters after 100 and add three periods'
 });
 ```
 
-Run `npm run test` again. It breaks! You should get an error that the last 3 characters of the `shortened` string are not `...`. This is because it just so happens calling `.trim()` on this string after shortening it to 100 characters removed the empty space at the end making it 99 characters. The logic of our function then checks if the length of the string is 100 and if so it will add 3 periods. This is a fault in our logic and we caught it using a unit test. Let's refactor the function so that it correctly accounts for this case.
+Run `npm run test` again. It breaks! You should get an error that the last 3 characters of the `shortened` string are not `...`. This is because it just so happens calling `.trim()` on this string after shortening it to 100 characters removed the empty space at the end making it 99 characters. The logic of our function then checks if the length of the string is 100 and if so it will add 3 periods. This is a fault in our logic and we caught it using a unit test. Let's go to `src/utils/functions.js` and refactor the function so that it correctly accounts for this case.
 
 ```js
 export const shortenText = text => {
@@ -199,7 +199,7 @@ it('attachUserName should correctly attach a users full name to a post', () => {
 });
 ```
 
-Run `npm run test`. You should see a failing test here. This is because one of our posts does not have a matching user. we will need to refactor this function to filter out posts that do have a matching user.
+Run `npm run test`. You should see a failing test here. This is because one of our posts does not have a matching user. we will need to refactor this function in `server/utils.js` to filter for posts that do have a matching user.
 
 ```js
 attachUserName(users, posts) {
@@ -284,7 +284,7 @@ export const shortenText = text => {
 
 <details>
 
-<summary> <code> src/utils/functions.js </code> </summary>
+<summary> <code> server/utils.js </code> </summary>
 
 ```js
 module.exports = {
